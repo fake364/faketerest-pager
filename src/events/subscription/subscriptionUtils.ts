@@ -1,4 +1,3 @@
-import EVENT_TYPE, { DATABASE_ACTION } from "../types";
 import { ParsedSubscriptionPayload, SubscriptionInsertPayload } from "./types";
 import { databasePool, RedisClient } from "../../server";
 import getFromToSubscription from "./queries/getFromToSubscription";
@@ -7,6 +6,9 @@ import { RedisSubscriptionPayload } from "../../redis/subscription/type";
 import { mapRedisSubscriptionTypeToBase } from "./mappers/mappers";
 import sendPayloadToClients from "../../clients/sendPayloadToCliends";
 import { CLIENT_EVENTS } from "../../clients/enums";
+import EVENT_TYPE, {
+  DATABASE_ACTION
+} from "faketerest-utilities/dist/events/types";
 
 const isSubscriptionInsertPayloadValid = (
   values: string[]
@@ -51,13 +53,14 @@ const saveSubscriptionToDB = async (
   const stringObj = JSON.stringify({
     ...subscriptionPayload
   });
-  await RedisClient.set(
-    EventParseUtils.getDataKeyByEvent(saveForId, EVENT_TYPE.SUBSCRIPTION),
-    stringObj
+  const key = EventParseUtils.getDataKeyByEvent(
+    saveForId,
+    EVENT_TYPE.SUBSCRIPTION
   );
+  await RedisClient.set(key, stringObj);
   await RedisClient.disconnect();
-
-  return subscriptionPayload;
+  const parsedKey = key.split(":")[2];
+  return { key: parsedKey, payload: subscriptionPayload };
 };
 
 const checkTypeAndSaveNotification = async (action: string[]) => {
@@ -68,7 +71,7 @@ const checkTypeAndSaveNotification = async (action: string[]) => {
       const row = payload.rows[0];
       if (payload.rowCount === 1) {
         const payload = await saveSubscriptionToDB(to, row);
-        sendPayloadToClients(CLIENT_EVENTS.SUBSCRIPTION, to, payload);
+        sendPayloadToClients(CLIENT_EVENTS.COMMON_NOTIFICATION, to, payload);
       }
     }
   } catch (e) {

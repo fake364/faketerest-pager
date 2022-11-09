@@ -1,3 +1,3 @@
 export enum CLIENT_EVENTS {
-  SUBSCRIPTION = "subscription"
+  COMMON_NOTIFICATION = "common_notification"
 }

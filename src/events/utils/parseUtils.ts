@@ -1,6 +1,6 @@
-import EVENT_TYPE from "../types";
 import SubscriptionUtils from "../subscription/subscriptionUtils";
 import { uuid } from "uuidv4";
+import EVENT_TYPE from "faketerest-utilities/dist/events/types";
 
 const isEventType = (value: string): value is EVENT_TYPE => {
   return Object.values(EVENT_TYPE).some((type) => type === value);
@@ -10,6 +10,9 @@ const handleEvent = (event: EVENT_TYPE, action: string[]) => {
   switch (event) {
     case EVENT_TYPE.SUBSCRIPTION:
       SubscriptionUtils.checkTypeAndSaveNotification(action);
+      break;
+    case EVENT_TYPE.POST_CREATE:
+      console.log("POST CREATE HAPPENED", action);
       break;
   }
 };

@@ -1,8 +1,6 @@
-import {
-  RedisSubscriptionPayload,
-  SubscriptionPayload,
-} from "../../../redis/subscription/type";
-import EVENT_TYPE from "../../types";
+import { RedisSubscriptionPayload } from "../../../redis/subscription/type";
+import { SubscriptionPayload } from "faketerest-utilities/dist/events/subscription/types";
+import EVENT_TYPE from "faketerest-utilities/dist/events/types";
 
 export const mapRedisSubscriptionTypeToBase = (
   {
@@ -14,7 +12,7 @@ export const mapRedisSubscriptionTypeToBase = (
     fromlastname,
     toid,
     fromfirstname,
-    createdat,
+    createdat
   }: RedisSubscriptionPayload,
   hasBeenRead: boolean,
   eventType: EVENT_TYPE
@@ -29,5 +27,5 @@ export const mapRedisSubscriptionTypeToBase = (
   toId: toid,
   hasBeenRead,
   createdAt: createdat,
-  eventType,
+  eventType
 });

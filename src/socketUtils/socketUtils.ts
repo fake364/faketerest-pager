@@ -1,16 +1,11 @@
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { Socket } from "socket.io";
+import { RedisClient, SocketMapByUserId, SocketType } from "../server";
 import {
-  databasePool,
-  RedisClient,
-  SocketMapByUserId,
-  SocketType
-} from "../server";
-import filterDuplicateNotifications from "./filterDuplicateNotifications";
+  filterAndSortNotifications,
+  NotificationType
+} from "faketerest-utilities";
 
-export const getUserIdHeaderFromSocket = (
-  socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
-) => socket.handshake.headers["x-user-id"];
+export const getUserIdHeaderFromSocket = (socket: SocketType) =>
+  socket.handshake.headers["x-user-id"];
 
 export const addSocketToMap = (socket: SocketType) => {
   const userId = getUserIdHeaderFromSocket(socket) as string | undefined;
@@ -39,7 +34,7 @@ export const sendUniqueNotifications = async (socket: SocketType) => {
   if (userId) {
     await RedisClient.connect();
     const keys = await RedisClient.keys(`${userId}:*`);
-    const notifications: any[] = [];
+    const notifications: NotificationType[] = [];
     for (const key of keys) {
       const result = await RedisClient.get(key);
       const parsedKey = key.split(":")[2];
@@ -54,7 +49,7 @@ export const sendUniqueNotifications = async (socket: SocketType) => {
 
     socket.emit(
       "init-notifications",
-      filterDuplicateNotifications(notifications)
+      filterAndSortNotifications(notifications)
     );
 
     await RedisClient.disconnect();
