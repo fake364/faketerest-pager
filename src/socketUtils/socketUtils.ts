@@ -3,6 +3,7 @@ import {
   filterAndSortNotifications,
   NotificationType
 } from "faketerest-utilities";
+import { CLIENT_EVENTS } from "faketerest-utilities/dist/events/types";
 
 export const getUserIdHeaderFromSocket = (socket: SocketType) =>
   socket.handshake.headers["x-user-id"];
@@ -48,7 +49,7 @@ export const sendUniqueNotifications = async (socket: SocketType) => {
     }
 
     socket.emit(
-      "init-notifications",
+      CLIENT_EVENTS.INIT_NOTIFICATIONS,
       filterAndSortNotifications(notifications)
     );
 

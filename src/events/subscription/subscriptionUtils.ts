@@ -5,8 +5,8 @@ import EventParseUtils from "../utils/parseUtils";
 import { RedisSubscriptionPayload } from "../../redis/subscription/type";
 import { mapRedisSubscriptionTypeToBase } from "./mappers/mappers";
 import sendPayloadToClients from "../../clients/sendPayloadToCliends";
-import { CLIENT_EVENTS } from "../../clients/enums";
 import EVENT_TYPE, {
+  CLIENT_EVENTS,
   DATABASE_ACTION
 } from "faketerest-utilities/dist/events/types";
 

@@ -1,5 +1,5 @@
-import { CLIENT_EVENTS } from "./enums";
 import { SocketMapByUserId } from "../server";
+import {CLIENT_EVENTS} from "faketerest-utilities/dist/events/types";
 
 const sendPayloadToClients = (
   event: CLIENT_EVENTS,
