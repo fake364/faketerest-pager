@@ -6,6 +6,7 @@ import PostCreatePayload from "faketerest-utilities/dist/events/postCreate/types
 import { RedisClient } from "../../server";
 import EventParseUtils from "../utils/parseUtils";
 import sendPayloadToClients from "../../clients/sendPayloadToCliends";
+import { NotificationType } from "faketerest-utilities";
 
 const isActionStringType = (
   action: any[]
@@ -42,20 +43,17 @@ const saveAndNotifyUsersOnPostCreation = async (
   ids: { id: string }[]
 ) => {
   await RedisClient.connect();
-
   for (const subscribedId of ids) {
-    await RedisClient.set(
-      EventParseUtils.getDataKeyByEvent(
-        Number(subscribedId.id),
-        EVENT_TYPE.POST_CREATE
-      ),
-      JSON.stringify(object)
+    const notificationKey = EventParseUtils.getDataKeyByEvent(
+      Number(subscribedId.id),
+      EVENT_TYPE.POST_CREATE
     );
+    await RedisClient.set(notificationKey, JSON.stringify(object));
 
     sendPayloadToClients(
       CLIENT_EVENTS.COMMON_NOTIFICATION,
       Number(subscribedId.id),
-      object
+      { payload: object, key: notificationKey } as NotificationType
     );
   }
   await RedisClient.disconnect();
