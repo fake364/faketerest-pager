@@ -15,6 +15,7 @@ const handleEvent = (event: EVENT_TYPE, action: string[]) => {
       break;
     case EVENT_TYPE.POST_CREATE:
       PostCreation.checkTypeAndSaveNotification(action);
+      break;
     case EVENT_TYPE.COMMENT:
       PostCommented.checkActionAndSaveNotification(action);
       break;

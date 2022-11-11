@@ -53,7 +53,10 @@ const saveAndNotifyUsersOnPostCreation = async (
     sendPayloadToClients(
       CLIENT_EVENTS.COMMON_NOTIFICATION,
       Number(subscribedId.id),
-      { payload: object, key: notificationKey } as NotificationType
+      {
+        payload: object,
+        key: notificationKey.split(":")[2]
+      } as NotificationType
     );
   }
   await RedisClient.disconnect();
