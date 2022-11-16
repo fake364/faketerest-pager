@@ -18,7 +18,9 @@ export const databasePool = new Pool({
   port: 5432
 });
 
-export type SocketType = Socket<DefaultEventsMap, DefaultEventsMap>;
+export type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> & {
+  userId?: number;
+};
 
 export const SocketMapByUserId: {
   [key: string]: SocketType[];

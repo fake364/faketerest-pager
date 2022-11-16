@@ -4,13 +4,15 @@ import {
   NotificationType
 } from "faketerest-utilities";
 import { CLIENT_EVENTS } from "faketerest-utilities/dist/events/types";
+import { CUSTOM_HEADERS } from "faketerest-utilities/dist/common/enums";
 
 export const getUserIdHeaderFromSocket = (socket: SocketType) =>
-  socket.handshake.headers["x-user-id"];
+  socket.handshake.headers[CUSTOM_HEADERS.X_CLIENT_ID];
 
 export const addSocketToMap = (socket: SocketType) => {
   const userId = getUserIdHeaderFromSocket(socket) as string | undefined;
   if (userId) {
+    socket.userId = Number(userId);
     if (!SocketMapByUserId[userId]) {
       SocketMapByUserId[userId] = [];
     }

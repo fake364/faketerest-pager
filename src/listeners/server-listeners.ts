@@ -4,13 +4,28 @@ import {
   removeDisconnectedSocket,
   sendUniqueNotifications
 } from "../socketUtils/socketUtils";
-import { PagerServer, RedisClient } from "../server";
-import { CLIENT_EVENTS } from "faketerest-utilities/dist/events/types";
+import { PagerServer, RedisClient, SocketType } from "../server";
+import EVENT_TYPE, {
+  CLIENT_EVENTS
+} from "faketerest-utilities/dist/events/types";
 import Notifications from "../notifications";
+import MessagePayload from "faketerest-utilities/dist/events/message/type";
+import { uuid } from "uuidv4";
+import { CUSTOM_HEADERS } from "faketerest-utilities/dist/common/enums";
+import {
+  createMessagePayload,
+  pushMessage
+} from "../message/utils/messageUtils";
 
-PagerServer.on("connection", async (socket) => {
+PagerServer.on("connection", async (socket: SocketType) => {
   addSocketToMap(socket);
-  await sendUniqueNotifications(socket);
+  const connectToRoom = socket.handshake.headers[CUSTOM_HEADERS.X_JOIN_ROOM];
+  if (!connectToRoom) {
+    await sendUniqueNotifications(socket);
+  } else {
+    console.log("socket", socket.userId, "joined room", connectToRoom);
+    socket.join(connectToRoom);
+  }
   socket.on("disconnect", () => {
     removeDisconnectedSocket(socket);
   });
@@ -21,5 +36,31 @@ PagerServer.on("connection", async (socket) => {
     if (userId) {
       await Notifications.readAllNotifications(userId, keys);
     }
+  });
+
+  socket.on("message", async (roomKey: string, text: string) => {
+    const payload = createMessagePayload(text, socket.userId!);
+    await pushMessage(roomKey, payload);
+    console.log("ROOM", roomKey, payload);
+    PagerServer.to(roomKey).emit("message", payload);
+  });
+
+  socket.on("read-messages", async (roomKey: string, keys: string) => {
+    await RedisClient.connect();
+    for (const key of keys) {
+      const payload = await RedisClient.hGet(roomKey, key);
+      if (payload) {
+        try {
+          const parsedPayload: MessagePayload = JSON.parse(payload);
+          parsedPayload.hasBeenRead = true;
+          await RedisClient.hSet(roomKey, key, JSON.stringify(parsedPayload));
+        } catch (e) {
+          console.error("Could not parse message");
+        }
+      }
+    }
+    await RedisClient.disconnect();
+
+    PagerServer.to(roomKey).emit("read-messages", keys);
   });
 });
