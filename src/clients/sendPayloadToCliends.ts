@@ -8,7 +8,7 @@ const sendPayloadToClients = (
 ) => {
   if (SocketMapByUserId[clientId]?.length > 0) {
     SocketMapByUserId[clientId].forEach((socket) => {
-      socket.emit(CLIENT_EVENTS.COMMON_NOTIFICATION, ...payload);
+      socket.emit(event, ...payload);
       console.log("PUSHED NOTIFICATION TO", clientId);
     });
   } else {

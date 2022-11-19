@@ -5,17 +5,17 @@ import {
   sendUniqueNotifications
 } from "../socketUtils/socketUtils";
 import { PagerServer, RedisClient, SocketType } from "../server";
-import EVENT_TYPE, {
-  CLIENT_EVENTS
-} from "faketerest-utilities/dist/events/types";
+import { CLIENT_EVENTS } from "faketerest-utilities/dist/events/types";
 import Notifications from "../notifications";
 import MessagePayload from "faketerest-utilities/dist/events/message/type";
-import { uuid } from "uuidv4";
 import { CUSTOM_HEADERS } from "faketerest-utilities/dist/common/enums";
 import {
   createMessagePayload,
-  pushMessage
+  pushMessage,
+  sendMessageNotificationToParticipants
 } from "../message/utils/messageUtils";
+import sendPayloadToClients from "../clients/sendPayloadToCliends";
+import MessageUtils from "faketerest-utilities/dist/events/message/messageUtils";
 
 PagerServer.on("connection", async (socket: SocketType) => {
   addSocketToMap(socket);
@@ -42,6 +42,7 @@ PagerServer.on("connection", async (socket: SocketType) => {
     const payload = createMessagePayload(text, socket.userId!);
     await pushMessage(roomKey, payload);
     console.log("ROOM", roomKey, payload);
+    sendMessageNotificationToParticipants(roomKey, socket.userId!, payload);
     PagerServer.to(roomKey).emit("message", payload);
   });
 

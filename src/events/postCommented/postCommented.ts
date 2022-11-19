@@ -22,19 +22,23 @@ const saveCommentNotification = async (
 const getPayloadAndKey = (
   firstName: string,
   lastName: Nullable<string>,
-  userId: number,
+  commentAuthorId: number,
   text: string,
-  postId: string
+  postId: string,
+  saveForUserId: number
 ) => {
   const payload: PostCommentedPayload =
     PostCommentedParseUtils.mapDataToPayload(
       postId,
-      userId,
+      commentAuthorId,
       firstName,
       lastName,
       text
     );
-  const key = EventParseUtils.getDataKeyByEvent(userId, EVENT_TYPE.COMMENT);
+  const key = EventParseUtils.getDataKeyByEvent(
+    saveForUserId,
+    EVENT_TYPE.COMMENT
+  );
   return { key, payload };
 };
 
@@ -63,20 +67,24 @@ const saveAndNotifyAuthor = async (
 
 const checkActionAndSaveNotification = async (action: string[]) => {
   if (PostCommentedParseUtils.isPostCommentedAction(action)) {
-    const commentText = action[2];
-    const postId = action[3];
-    const commentAuthorId = Number(action[4]);
+    const { commentText, commentAuthorId, postId } =
+      PostCommentedParseUtils.getActionPayload(action);
     try {
       const { rows, rowCount } = await databasePool.query(
         selectUserNameById(commentAuthorId)
       );
-      if (rowCount === 1) {
+      const { rowCount: usersCount, rows: userRows } = await databasePool.query(
+        selectPostAuthorUserIdByComment(postId)
+      );
+      if (rowCount === 1 && usersCount === 1) {
+        const postAuthorId = Number(userRows[0].fk_user_id);
         const { key, payload } = getPayloadAndKey(
           rows[0].FIRST_NAME,
           rows[0].LAST_NAME,
           commentAuthorId,
           commentText,
-          postId
+          postId,
+          postAuthorId
         );
         await saveAndNotifyAuthor(commentAuthorId, postId, key, payload);
       }

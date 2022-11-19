@@ -29,6 +29,17 @@ const mapDataToPayload = (
   text
 });
 
-const PostCommentedParseUtils = { isPostCommentedAction, mapDataToPayload };
+const getActionPayload = (action: string[]) => {
+  const commentText = action[2];
+  const postId = action[3];
+  const commentAuthorId = Number(action[4]);
+  return { commentText, postId, commentAuthorId };
+};
+
+const PostCommentedParseUtils = {
+  isPostCommentedAction,
+  mapDataToPayload,
+  getActionPayload
+};
 
 export default PostCommentedParseUtils;
