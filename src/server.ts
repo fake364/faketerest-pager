@@ -2,20 +2,18 @@ import { createAdapter, PostgresAdapter } from "@socket.io/postgres-adapter";
 import { createClient } from "redis";
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+require("dotenv").config();
 
 const { Pool } = require("pg");
 
 export const PagerServer = new Server({ cors: { origin: "*" } });
-// DB_USERNAME=postgres
-// DB_NAME=postgres
-// DB_PASSWORD=d48t4r
-// DB_HOST=localhost:5432
+
 export const databasePool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "postgres",
-  password: "d48t4r",
-  port: 5432
+  user: process.env.POSTGRE_DB_USER,
+  host: process.env.POSTGRE_DB_HOST,
+  database: process.env.POSTGRE_DB_NAME,
+  password: process.env.POSTGRE_DB_PASS,
+  port: process.env.POSTGRE_DB_PORT
 });
 
 export type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> & {
@@ -35,7 +33,8 @@ const adapter: PostgresAdapter = createAdapter(databasePool, {
 PagerServer.adapter(adapter);
 
 export const RedisClient = createClient({
-  url: "redis://localhost:6379"
+  url: `redis://${process.env.REDIS_DB_HOST}`,
+  password: process.env.REDIS_DB_PASS
 });
 
 PagerServer.listen(3003);
