@@ -7,9 +7,9 @@
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "typeRoots": ["./node_modules/@types"]
   },
-  "exclude":[
-    "./node_modules"
-  ]
+
+  "include": ["./src/*"]
 }
