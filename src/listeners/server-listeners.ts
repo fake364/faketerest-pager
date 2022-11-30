@@ -18,7 +18,6 @@ import sendPayloadToClients from "../clients/sendPayloadToCliends";
 import MessageUtils from "faketerest-utilities/dist/events/message/messageUtils";
 
 PagerServer.on("connection", async (socket: SocketType) => {
-  console.log('connect attempt');
   addSocketToMap(socket);
   const connectToRoom = socket.handshake.headers[CUSTOM_HEADERS.X_JOIN_ROOM];
   if (!connectToRoom) {
