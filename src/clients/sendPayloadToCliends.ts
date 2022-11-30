@@ -9,7 +9,6 @@ const sendPayloadToClients = (
   if (SocketMapByUserId[clientId]?.length > 0) {
     SocketMapByUserId[clientId].forEach((socket) => {
       socket.emit(event, ...payload);
-      console.log("PUSHED NOTIFICATION TO", clientId);
     });
   } else {
     console.warn("No such client");

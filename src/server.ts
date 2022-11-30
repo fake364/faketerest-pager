@@ -6,7 +6,10 @@ require("dotenv").config();
 
 const { Pool } = require("pg");
 
-export const PagerServer = new Server({ cors: { origin: "*" } });
+export const PagerServer = new Server({
+  cors: { origin: "*" },
+  path: "/pager-connect"
+});
 
 export const databasePool = new Pool({
   user: process.env.DB_USERNAME,
@@ -34,7 +37,7 @@ PagerServer.adapter(adapter);
 
 export const RedisClient = createClient({
   url: `redis://${process.env.REDIS_DB_HOST}:${process.env.REDIS_DB_PORT}`,
-  password: process.env.REDIS_DB_PASS,
+  password: process.env.REDIS_DB_PASS
 });
 
 PagerServer.listen(3003);
