@@ -7,13 +7,12 @@ require("dotenv").config();
 const { Pool } = require("pg");
 
 export const PagerServer = new Server({
-  cors: { origin: "*" },
   path: "/pager-connect"
 });
 
 export const databasePool = new Pool({
   user: process.env.DB_USERNAME,
-  host: process.env.DB_HOST,
+  host: 'postgres',
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT
@@ -36,7 +35,7 @@ const adapter: PostgresAdapter = createAdapter(databasePool, {
 PagerServer.adapter(adapter);
 
 export const RedisClient = createClient({
-  url: `redis://${process.env.REDIS_DB_HOST}:${process.env.REDIS_DB_PORT}`,
+  url: `redis://redis:${process.env.REDIS_DB_PORT}`,
   password: process.env.REDIS_DB_PASS
 });
 
