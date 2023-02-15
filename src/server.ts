@@ -12,7 +12,7 @@ export const PagerServer = new Server({
 
 export const databasePool = new Pool({
   user: process.env.DB_USERNAME,
-  host: 'postgres',
+  host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT
@@ -35,7 +35,7 @@ const adapter: PostgresAdapter = createAdapter(databasePool, {
 PagerServer.adapter(adapter);
 
 export const RedisClient = createClient({
-  url: `redis://redis:${process.env.REDIS_DB_PORT}`,
+  url: `redis://${process.env.REDIS_DB_HOST}:${process.env.REDIS_DB_PORT}`,
   password: process.env.REDIS_DB_PASS
 });
 
