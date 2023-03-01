@@ -1,5 +1,5 @@
 #!/bin/bash
 
 rm -rf ./dist
-tsc
+npx tsc
 cp ./.env dist
